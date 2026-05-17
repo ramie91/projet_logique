@@ -1,9 +1,9 @@
-# SatFisa (Matéo et Ines)
+# SatElite (Nasseraldin Ramie)
 
 ## Description
 
-SatFisa est un projet développé en Python.  
-Le projet utilise un environnement virtuel Python (`venv`) afin d’isoler les dépendances et garantir un fonctionnement propre du programme.
+SatElite est un projet développé en Java.  
+Le programme lit un puzzle EasyAsABC, génère les clauses logiques au format DIMACS, puis résout le puzzle avec un solveur SAT intégré.
 
 ---
 
@@ -11,32 +11,31 @@ Le projet utilise un environnement virtuel Python (`venv`) afin d’isoler les d
 
 Avant de lancer le projet, il est nécessaire d’installer :
 
-- Python 3
-- Le module `venv`
+- Java
+- Le JDK (`javac`)
 
 Sous Ubuntu / Debian / WSL, utilisez la commande suivante :
 
 ```bash
 sudo apt update
-sudo apt install python3 python3-venv
+sudo apt install default-jdk
 ```
 
 ---
 
-## Installation et vérification
+## Compilation et vérification
 
-Pour vérifier que tous les pré-requis sont installés, créer l’environnement virtuel et installer les dépendances du projet :
+Pour vérifier que tous les pré-requis sont installés et compiler le projet :
 
 ```bash
-make venv
+make build
 ```
 
 Cette commande :
 
-- vérifie la présence de `python3`
-- vérifie la présence du module `venv`
-- crée le dossier `.venv`
-- installe les dépendances présentes dans `requirements.txt`
+- vérifie la présence de `java`
+- vérifie la présence de `javac`
+- compile `Main.java`
 
 ---
 
@@ -51,7 +50,7 @@ make run PUZZLE=<puzzle_x.txt> DIMACS=<dimacs_x.txt>
 
 ## Nettoyage
 
-Pour supprimer l’environnement virtuel :
+Pour supprimer les fichiers générés :
 ```bash
 make clean
 ```
@@ -61,10 +60,14 @@ make clean
 ## Structure du projet
 ```pgsql
 .
-├── .venv/             # Environnement virtuel Python
-├── requirements.txt   # Dépendances Python
-├── Makefile           # Automatisation des commandes
-├── main.py            # Point d’entrée du projet
+├── src/               # Fichiers source Java
+│   ├── Main.java
+│   ├── EasyAsABCSolver.java
+│   ├── SatSolver.java
+│   ├── Cnf.java
+│   ├── Position.java
+│   └── SatVariables.java
+├── makefile           # Automatisation des commandes
 ├── Dimacs/            # Dossier qui contient les clauses logiques du puzzle.
 ├── Puzzle/            # Dossier qui contient les puzzles.
 └── README.md          # Manuel d'utilisation.
@@ -75,12 +78,11 @@ make clean
 ## Commandes disponibles
 | Commande     | Description                                              |
 | ------------ | -------------------------------------------------------- |
-| `make venv`  | Crée l’environnement virtuel et installe les dépendances |
+| `make build` | Compile le projet Java                                   |
 | `make run`   | Lance le projet                                          |
-| `make clean` | Supprime l’environnement virtuel                         |
+| `make clean` | Supprime les fichiers compilés et les fichiers DIMACS    |
 
 ---
 
 ## Authors
-- @ines.bendar | Ines BENDAR
-- @mateo.siuda | Matéo SIUDA
+- @ramie.nasseraldin  (Ramie NASSERALDIN)

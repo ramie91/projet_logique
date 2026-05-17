@@ -1,35 +1,36 @@
 # Variables
 
-PYTHON = .venv/bin/python
-PIP = .venv/bin/pip
+JAVAC = javac
+JAVA = java
+SRC_DIR = src
+BUILD_DIR = build/classes
 
-# Vérifie si python3 est installé
-check-python:
-	@command -v python3 > /dev/null 2>&1 || ( \
-		echo "Python3 n'est pas installé."; \
-		echo "Pour installer Python3, se référer au README.md"; \
+# Vérifie si Java est installé
+check-java:
+	@command -v $(JAVA) > /dev/null 2>&1 || ( \
+		echo "Java n'est pas installé."; \
+		echo "Pour installer Java, se référer au README.md"; \
+		exit 1; \
+	)
+	@command -v $(JAVAC) > /dev/null 2>&1 || ( \
+		echo "javac n'est pas installé."; \
+		echo "Pour installer le JDK, se référer au README.md"; \
+		exit 1; \
 	)
 
-# Vérifie si venv est installé
-check-venv:
-	@python3 -m venv --help > /dev/null 2>&1 || ( \
-		echo "Le module venv n'est pas installé."; \
-		echo "Pour installer le module venv, se référer au README.md"; \
-	)
-
-# Création du venv
-venv: check-python check-venv
-	python3 -m venv .venv
-	$(PIP) install -r requirements.txt
+# Compilation du projet
+build: check-java
+	mkdir -p $(BUILD_DIR)
+	$(JAVAC) -d $(BUILD_DIR) $(SRC_DIR)/*.java
 
 # Lancement du projet
-run:
+run: build
 	@if [ -z "$(PUZZLE)" ] || [ -z "$(DIMACS)" ]; then \
 		echo "Usage : make run PUZZLE=<puzzle_x.txt> DIMACS=<dimacs_x.txt>"; \
 		exit 1; \
 	fi
-	$(PYTHON) main.py $(PUZZLE) $(DIMACS)
+	$(JAVA) -cp $(BUILD_DIR) Main $(PUZZLE) $(DIMACS)
 
 # Nettoyage
 clean:
-	rm -rf .venv Dimacs/*
+	rm -rf build Dimacs/*
