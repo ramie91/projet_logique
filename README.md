@@ -2,14 +2,14 @@
 
 ## Description
 
-SatElite est un projet développé en Java.  
-Le programme lit un puzzle EasyAsABC, génère les clauses logiques au format DIMACS, puis résout le puzzle avec un solveur SAT intégré.
+SatElite est un projet que j'ai développé en Java.  
+Mon programme lit un puzzle EasyAsABC, génère les clauses logiques au format DIMACS, puis résout le puzzle avec le solveur SAT Sat4J.
 
 ---
 
 ## Pré-requis
 
-Avant de lancer le projet, il est nécessaire d’installer :
+Avant de lancer mon projet, il faut installer :
 
 - Java
 - Le JDK (`javac`)
@@ -26,7 +26,7 @@ sudo apt install default-jdk maven
 
 ## Compilation et vérification
 
-Pour vérifier que tous les pré-requis sont installés et compiler le projet :
+Pour vérifier que tous les pré-requis sont installés et compiler mon projet :
 
 ```bash
 make build
@@ -43,8 +43,8 @@ Cette commande :
 ---
 
 ## Lancement du projet
-A l'exécution du programme, il faut choisir un fichier puzzle et un fichier dimacs qui sont stockés respectivement dans les dossiers Puzzle et Dimacs.<br>
-Pour exécuter le programme :
+A l'exécution de mon programme, je choisis un fichier puzzle et un fichier DIMACS. Les puzzles sont stockés dans `Puzzle/` et les fichiers DIMACS sont générés dans `Dimacs/`.<br>
+Pour exécuter mon programme :
 ```bash
 make run PUZZLE=<puzzle_x.txt> DIMACS=<dimacs_x.txt>
 ```
@@ -53,7 +53,7 @@ make run PUZZLE=<puzzle_x.txt> DIMACS=<dimacs_x.txt>
 
 ## Nettoyage
 
-Pour supprimer les fichiers générés :
+Pour supprimer les fichiers générés par mon projet :
 ```bash
 make clean
 ```
@@ -63,7 +63,7 @@ make clean
 ## Structure du projet
 ```pgsql
 .
-├── src/               # Fichiers source Java
+├── src/               # Mes fichiers source Java
 │   ├── Main.java
 │   ├── EasyAsABCSolver.java
 │   ├── SatSolver.java  # Adaptateur vers Sat4J
@@ -72,8 +72,8 @@ make clean
 │   └── SatVariables.java
 ├── pom.xml            # Dépendance Sat4J
 ├── makefile           # Automatisation des commandes
-├── Dimacs/            # Dossier qui contient les clauses logiques du puzzle.
-├── Puzzle/            # Dossier qui contient les puzzles.
+├── Dimacs/            # Dossier dans lequel je génère les clauses logiques.
+├── Puzzle/            # Dossier dans lequel je stocke les puzzles.
 └── README.md          # Manuel d'utilisation.
 ```
 
@@ -82,9 +82,9 @@ make clean
 ## Commandes disponibles
 | Commande     | Description                                              |
 | ------------ | -------------------------------------------------------- |
-| `make build` | Compile le projet Java                                   |
-| `make run`   | Lance le projet                                          |
-| `make test`  | Lance les instances de test fournies                     |
+| `make build` | Compile mon projet Java                                  |
+| `make run`   | Lance mon programme                                      |
+| `make test`  | Lance mes instances de test                              |
 | `make clean` | Supprime les fichiers compilés et les fichiers DIMACS    |
 
 ---
