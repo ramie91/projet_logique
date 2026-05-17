@@ -2,3 +2,5 @@
 Dimacs/*
 *.class
 build/
+lib/
+.m2/

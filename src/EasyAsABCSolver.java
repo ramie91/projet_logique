@@ -406,6 +406,7 @@ class EasyAsABCSolver {
         }
         validSymbols[gridSize - 2] = empty;
 
+        forbidUnusedSymbol(gridSize - 2);
         addSymbolClauses(validSymbols);
         addEachLetterOncePerRow(gridSize - 2);
         addEachLetterOncePerColumn(gridSize - 2);
@@ -413,6 +414,14 @@ class EasyAsABCSolver {
         addExactlyTwoEmptiesPerColumn(empty);
         addAllClueClauses(letterToIdx, empty);
         addInitialGridClauses(letterToIdx, empty, validSymbols, gridSize - 2);
+    }
+
+    private void forbidUnusedSymbol(int symbol) {
+        for (int r = 0; r < gridSize; r++) {
+            for (int c = 0; c < gridSize; c++) {
+                addClause(-SatVariables.variable(r, c, symbol, gridSize));
+            }
+        }
     }
 
     private int[] range(int start, int endExclusive) {
@@ -662,6 +671,7 @@ class EasyAsABCSolver {
         Cnf cnf = Cnf.read(dimacsFile);
         System.out.println("\nDonnees CNF chargees :");
         System.out.println("  Fichier lu           : " + dimacsFile);
+        System.out.println("  Solveur SAT          : Sat4J");
         System.out.println("  Variables            : " + cnf.totalVars);
         System.out.println("  Clauses              : " + cnf.clauses.size());
         System.out.println("  Literaux             : " + countLiterals(cnf.clauses));

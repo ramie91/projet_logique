@@ -13,12 +13,13 @@ Avant de lancer le projet, il est nécessaire d’installer :
 
 - Java
 - Le JDK (`javac`)
+- Maven
 
 Sous Ubuntu / Debian / WSL, utilisez la commande suivante :
 
 ```bash
 sudo apt update
-sudo apt install default-jdk
+sudo apt install default-jdk maven
 ```
 
 ---
@@ -35,6 +36,8 @@ Cette commande :
 
 - vérifie la présence de `java`
 - vérifie la présence de `javac`
+- vérifie la présence de `maven`
+- télécharge la dépendance Sat4J dans `lib/`
 - compile `Main.java`
 
 ---
@@ -63,10 +66,11 @@ make clean
 ├── src/               # Fichiers source Java
 │   ├── Main.java
 │   ├── EasyAsABCSolver.java
-│   ├── SatSolver.java
+│   ├── SatSolver.java  # Adaptateur vers Sat4J
 │   ├── Cnf.java
 │   ├── Position.java
 │   └── SatVariables.java
+├── pom.xml            # Dépendance Sat4J
 ├── makefile           # Automatisation des commandes
 ├── Dimacs/            # Dossier qui contient les clauses logiques du puzzle.
 ├── Puzzle/            # Dossier qui contient les puzzles.
@@ -80,6 +84,7 @@ make clean
 | ------------ | -------------------------------------------------------- |
 | `make build` | Compile le projet Java                                   |
 | `make run`   | Lance le projet                                          |
+| `make test`  | Lance les instances de test fournies                     |
 | `make clean` | Supprime les fichiers compilés et les fichiers DIMACS    |
 
 ---
