@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 class EasyAsABCSolver {
     private static final String RED = "\033[91m";
@@ -82,9 +83,10 @@ class EasyAsABCSolver {
             }
         }
 
-        printInitialGrid();
-
         totalVars = gridSize * gridSize * gridSize;
+        printInitialGrid();
+        printPuzzleData(inputFile, outputFile, lines.size());
+
         clauses = new ArrayList<>();
 
         switch (variant) {
@@ -107,9 +109,7 @@ class EasyAsABCSolver {
             }
         }
 
-        System.out.println("\nFichier DIMACS genere : " + outputFile);
-        System.out.println("  Grille " + gridSize + "x" + gridSize + ", variante "
-                + variant + ", " + totalVars + " variables, " + clauses.size() + " clauses");
+        printDimacsData(outputFile);
     }
 
     private void checkClueSize(String name, String clues) {
@@ -136,6 +136,118 @@ class EasyAsABCSolver {
         }
         System.out.println("   -" + "-".repeat(2 * gridSize));
         System.out.println("    " + spaced(bottomClues));
+    }
+
+    private void printPuzzleData(String inputFile, String outputFile, int nonEmptyLines) {
+        System.out.println("\nDonnees du puzzle :");
+        System.out.println("  Fichier puzzle       : " + inputFile);
+        System.out.println("  Fichier DIMACS       : " + outputFile);
+        System.out.println("  Lignes non vides     : " + nonEmptyLines);
+        System.out.println("  Variante             : " + variant);
+        System.out.println("  Taille grille        : " + gridSize + "x" + gridSize);
+        System.out.println("  Nombre de cases      : " + (gridSize * gridSize));
+        System.out.println("  Variables SAT prevues: " + totalVars);
+        System.out.println("  Symboles autorises   : " + symbolsForVariant());
+        System.out.println("  Indices haut         : " + topClues + " (" + spaced(topClues) + ")");
+        System.out.println("  Indices droite       : " + rightClues + " (" + spaced(rightClues) + ")");
+        System.out.println("  Indices bas          : " + bottomClues + " (" + spaced(bottomClues) + ")");
+        System.out.println("  Indices gauche       : " + leftClues + " (" + spaced(leftClues) + ")");
+        System.out.println("  Cases pre-remplies   : " + countCellsDifferentFrom('.'));
+        System.out.println("  Cases inconnues      : " + countCellsEqualTo('.'));
+        System.out.println("  Cases X imposees     : " + countCellsEqualTo('X'));
+        System.out.println("  Grille brute         : " + rawInitialGrid());
+        System.out.println("  Formule variable     : r * n * n + c * n + l + 1");
+    }
+
+    private String symbolsForVariant() {
+        int letterCount = switch (variant) {
+            case "Basic" -> gridSize;
+            case "Easy1" -> gridSize - 1;
+            case "Easy2" -> gridSize - 2;
+            default -> 0;
+        };
+
+        List<String> symbols = new ArrayList<>();
+        for (int i = 0; i < letterCount; i++) {
+            symbols.add(String.valueOf((char) ('A' + i)));
+        }
+        if (!"Basic".equals(variant)) {
+            symbols.add("X");
+        }
+        return String.join(", ", symbols);
+    }
+
+    private int countCellsEqualTo(char expected) {
+        int count = 0;
+        for (char cell : initialGrid) {
+            if (cell == expected) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private int countCellsDifferentFrom(char ignored) {
+        int count = 0;
+        for (char cell : initialGrid) {
+            if (cell != ignored) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private String rawInitialGrid() {
+        StringBuilder builder = new StringBuilder();
+        for (char cell : initialGrid) {
+            builder.append(cell);
+        }
+        return builder.toString();
+    }
+
+    private void printDimacsData(String outputFile) {
+        System.out.println("\nDonnees DIMACS :");
+        System.out.println("  Fichier genere       : " + outputFile);
+        System.out.println("  En-tete              : p cnf " + totalVars + " " + clauses.size());
+        System.out.println("  Variables            : " + totalVars);
+        System.out.println("  Clauses              : " + clauses.size());
+        System.out.println("  Literaux             : " + countLiterals(clauses));
+        System.out.println("  Longueur min clause  : " + minClauseLength(clauses));
+        System.out.println("  Longueur max clause  : " + maxClauseLength(clauses));
+        System.out.println("  Clauses par longueur : " + clauseLengthDistribution(clauses));
+        System.out.println("  Detail exhaustif     : disponible dans " + outputFile);
+    }
+
+    private int countLiterals(List<int[]> clausesToInspect) {
+        int total = 0;
+        for (int[] clause : clausesToInspect) {
+            total += clause.length;
+        }
+        return total;
+    }
+
+    private int minClauseLength(List<int[]> clausesToInspect) {
+        int min = Integer.MAX_VALUE;
+        for (int[] clause : clausesToInspect) {
+            min = Math.min(min, clause.length);
+        }
+        return min == Integer.MAX_VALUE ? 0 : min;
+    }
+
+    private int maxClauseLength(List<int[]> clausesToInspect) {
+        int max = 0;
+        for (int[] clause : clausesToInspect) {
+            max = Math.max(max, clause.length);
+        }
+        return max;
+    }
+
+    private Map<Integer, Integer> clauseLengthDistribution(List<int[]> clausesToInspect) {
+        Map<Integer, Integer> distribution = new TreeMap<>();
+        for (int[] clause : clausesToInspect) {
+            distribution.merge(clause.length, 1, Integer::sum);
+        }
+        return distribution;
     }
 
     private String spaced(String text) {
@@ -548,25 +660,60 @@ class EasyAsABCSolver {
 
     void solve(String dimacsFile) throws IOException {
         Cnf cnf = Cnf.read(dimacsFile);
+        System.out.println("\nDonnees CNF chargees :");
+        System.out.println("  Fichier lu           : " + dimacsFile);
+        System.out.println("  Variables            : " + cnf.totalVars);
+        System.out.println("  Clauses              : " + cnf.clauses.size());
+        System.out.println("  Literaux             : " + countLiterals(cnf.clauses));
+        System.out.println("  Clauses par longueur : " + clauseLengthDistribution(cnf.clauses));
+
         SatSolver solver = new SatSolver(cnf.totalVars, cnf.clauses);
 
         int[] model = solver.solve();
         if (model != null) {
             System.out.println("\nPuzzle satisfaisable.");
             solution = positiveLiterals(model);
+            printModelData("Premiere solution", model, solution);
 
             int[] blockingClause = solution.stream().mapToInt(lit -> -lit).toArray();
             solver.addClause(blockingClause);
+            System.out.println("\nRecherche deuxieme solution :");
+            System.out.println("  Clause de blocage    : " + blockingClause.length + " litteraux");
 
             int[] secondModel = solver.solve();
             if (secondModel != null) {
                 System.out.println("\nDeuxieme solution trouvee.");
                 secondSolution = positiveLiterals(secondModel);
+                printModelData("Deuxieme solution", secondModel, secondSolution);
+            } else {
+                System.out.println("\nAucune deuxieme solution trouvee.");
             }
         } else {
             System.out.println("\nPuzzle insatisfaisable.");
             solution = null;
         }
+    }
+
+    private void printModelData(String title, int[] model, Set<Integer> positives) {
+        int trueCount = 0;
+        int falseCount = 0;
+        int unassignedCount = 0;
+        for (int var = 1; var < model.length; var++) {
+            if (model[var] == 1) {
+                trueCount++;
+            } else if (model[var] == -1) {
+                falseCount++;
+            } else {
+                unassignedCount++;
+            }
+        }
+
+        System.out.println("\nDonnees modele - " + title + " :");
+        System.out.println("  Variables vraies     : " + trueCount);
+        System.out.println("  Variables fausses    : " + falseCount);
+        System.out.println("  Variables non fixees : " + unassignedCount);
+        System.out.println("  Literaux positifs    : " + positives.size());
+        System.out.println("  Cases affichees      : " + (gridSize * gridSize));
     }
 
     private Set<Integer> positiveLiterals(int[] model) {
