@@ -11,10 +11,11 @@ import java.util.Set;
 import java.util.TreeMap;
 
 class EasyAsABCSolver {
-    private static final String RED = "\033[91m";
-    private static final String GREEN = "\033[92m";
-    private static final String BLUE = "\033[94m";
-    private static final String ENDC = "\033[0m";
+    private static final boolean COLORS_ENABLED = System.console() != null && System.getenv("NO_COLOR") == null;
+    private static final String RED = COLORS_ENABLED ? "\033[91m" : "";
+    private static final String GREEN = COLORS_ENABLED ? "\033[92m" : "";
+    private static final String BLUE = COLORS_ENABLED ? "\033[94m" : "";
+    private static final String ENDC = COLORS_ENABLED ? "\033[0m" : "";
 
     private String variant;
     private String topClues;
@@ -31,6 +32,30 @@ class EasyAsABCSolver {
 
     boolean hasSolution() {
         return solution != null;
+    }
+
+    boolean hasSecondSolution() {
+        return secondSolution != null && !secondSolution.isEmpty();
+    }
+
+    String getVariant() {
+        return variant;
+    }
+
+    int getGridSize() {
+        return gridSize;
+    }
+
+    int getTotalVars() {
+        return totalVars;
+    }
+
+    int getClauseCount() {
+        return clauses == null ? 0 : clauses.size();
+    }
+
+    int getLiteralCount() {
+        return clauses == null ? 0 : countLiterals(clauses);
     }
 
     void generateDimacsFile(String inputFile, String outputFile) throws IOException {

@@ -85,6 +85,7 @@ make clean
 | ------------ | -------------------------------------------------------- |
 | `make build` | Compile mon projet Java                                  |
 | `make run`   | Lance mon programme                                      |
+| `make run-all` | Résout tous les puzzles du dossier `Puzzle/` avec statistiques globales |
 | `make test`  | Lance mes instances de test                              |
 | `make generate` | Génère automatiquement des instances de tailles différentes |
 | `make test-generated` | Lance les instances générées automatiquement        |

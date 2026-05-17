@@ -50,6 +50,10 @@ run: build
 	fi
 	$(JAVA) -cp "$(BUILD_DIR):$(SAT4J_CP)" Main $(PUZZLE) $(DIMACS)
 
+# Résout tous les puzzles du dossier Puzzle avec statistiques globales
+run-all: build
+	$(JAVA) -cp "$(BUILD_DIR):$(SAT4J_CP)" Main all
+
 # Tests sur les instances fournies
 test: build
 	$(JAVA) -cp "$(BUILD_DIR):$(SAT4J_CP)" Main puzzle_test_seconde_solution.txt test_seconde_solution.cnf
