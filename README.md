@@ -32,6 +32,12 @@ Pour vérifier que tous les pré-requis sont installés et compiler mon projet :
 make build
 ```
 
+Il est aussi possible de compiler directement avec Maven :
+
+```bash
+mvn -Dmaven.repo.local=.m2/repository compile
+```
+
 Cette commande :
 
 - vérifie la présence de `java`
@@ -39,6 +45,8 @@ Cette commande :
 - vérifie la présence de `maven`
 - télécharge la dépendance Sat4J dans `lib/`
 - compile `Main.java`
+
+La commande Maven compile les fichiers du dossier `src/` et place les classes compilées dans `target/classes`.
 
 ---
 
@@ -84,6 +92,7 @@ make clean
 | Commande     | Description                                              |
 | ------------ | -------------------------------------------------------- |
 | `make build` | Compile mon projet Java                                  |
+| `mvn -Dmaven.repo.local=.m2/repository compile` | Compile mon projet avec Maven |
 | `make run`   | Lance mon programme                                      |
 | `make run-all` | Résout tous les puzzles du dossier `Puzzle/` avec statistiques globales |
 | `make test`  | Lance mes instances de test                              |

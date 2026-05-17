@@ -2,6 +2,7 @@
 Dimacs/*
 *.class
 build/
+target/
 lib/
 .m2/
 GridGenerator.py
