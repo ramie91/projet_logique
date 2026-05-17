@@ -1,53 +1,92 @@
-# Rapport du projet SatElite
+# Rapport - SatElite
 
 Ramie NASSERALDIN
 
-## Nos choix
+## Presentation du projet
 
-Nous avons choisi d'utiliser le langage de programmation Java afin de respecter le sujet, qui demande l'utilisation de Sat4J pour une implementation en Java. Java permet egalement d'organiser le projet de maniere claire avec plusieurs classes, chacune ayant un role precis dans la resolution du puzzle.
+SatElite est mon implementation du mini-projet de logique autour du puzzle **Easy as ABC**. Le but est de partir d'une grille de puzzle, de la transformer en formule SAT, puis d'utiliser un solveur pour retrouver une grille complete qui respecte toutes les contraintes.
 
-Nous avons utilise le solveur SAT Sat4J, ajoute au projet avec Maven. Ce choix permet de s'appuyer sur un solveur SAT reconnu, tout en gardant un programme completement integre au code Java. Le fichier `pom.xml` contient la dependance necessaire a Sat4J, et le `makefile` se charge de recuperer les dependances, de compiler le projet et de lancer les tests.
+J'ai choisi de developper le projet en **Java** parce que c'est un langage que j'apprecie et avec lequel je suis a l'aise. La resolution SAT n'est donc pas faite par un solveur ecrit a la main : les clauses sont construites par mon programme, puis donnees a Sat4J.
 
-Le projet est structure autour d'une classe principale `EasyAsABCSolver`, qui centralise les
-fonctionnalites necessaires a la resolution du puzzle. Cette classe gere la lecture du fichier
-d'entree, la recuperation de la variante, des indices et de la grille initiale, puis la generation des clauses logiques correspondant au puzzle.
+Le projet s'appelle **SatElite**. Il contient plusieurs fichiers sources dans le dossier `src/`, des instances de puzzle dans `Puzzle/`, un dossier `Dimacs/` pour les fichiers CNF generes, un `makefile` pour automatiser les commandes et un `pom.xml` pour gerer la dependance Sat4J.
 
-La structure du projet suit plusieurs etapes successives. Dans un premier temps, le programme lit et analyse le fichier d'entree. Celui-ci contient la variante du puzzle, les indices situes en haut, a droite, en bas et a gauche, ainsi qu'une grille initiale optionnelle.
+## Fonctionnement general
 
-Dans un second temps, le puzzle est transforme en probleme SAT. Chaque case de la grille est representee par des variables booleennes indiquant quelle lettre ou quel symbole se trouve dans la case. Les contraintes du puzzle sont ensuite converties en clauses CNF. Le programme prend en charge les trois variantes demandees : `Basic`, `Easy1` et `Easy2`.
+Le programme suit le meme enchainement pour chaque puzzle.
 
-La troisieme etape correspond a la generation d'un fichier DIMACS. Ce format standard permet de representer le probleme SAT de maniere lisible par un solveur. Le fichier DIMACS est genere dans le dossier `Dimacs`.
+D'abord, il lit le fichier d'entree. Ce fichier indique la variante du puzzle, les indices autour de la grille et, si elle existe, une grille deja partiellement remplie. J'ai garde un format simple afin de pouvoir ajouter facilement de nouvelles instances.
 
-La quatrieme etape est celle de la resolution. Le programme recharge le fichier DIMACS, ajoute les clauses dans Sat4J, puis demande au solveur si le probleme est satisfaisable. Si une solution existe, le modele SAT retourne par Sat4J est recupere.
+Ensuite, le programme construit les variables SAT. Une variable represente le fait qu'une case donnee contient une lettre ou un symbole donne. La conversion en numero DIMACS est faite dans la classe `SatVariables`.
 
-Enfin, la derniere etape concerne l'affichage des resultats. La solution est reconstruite sous forme de grille. Les valeurs deja presentes dans la grille initiale sont affichees differemment afin de les distinguer des valeurs trouvees par le solveur. Le programme affiche aussi des informations sur le puzzle, le fichier DIMACS, le nombre de variables, le nombre de clauses et le solveur utilise.
+Apres cela, les contraintes du puzzle sont ajoutees sous forme de clauses. Ces contraintes imposent qu'une case ne contienne qu'un seul symbole, que les lettres apparaissent correctement dans les lignes et les colonnes, et que les indices exterieurs soient respectes.
 
-Cette organisation en etapes permet de separer clairement la generation du probleme SAT, son export au format DIMACS, sa resolution par Sat4J et l'affichage de la solution.
+Une fois les clauses construites, le programme ecrit un fichier au format **DIMACS CNF** dans le dossier `Dimacs/`. Ce fichier permet de visualiser le probleme SAT genere et de garder une trace standard de l'instance.
 
-## Nos resultats
+Enfin, le fichier DIMACS est relu, les clauses sont envoyees a **Sat4J**, puis le modele trouve est transforme en grille lisible. Si une premiere solution existe, le programme ajoute aussi une clause qui interdit de retrouver exactement cette meme solution, puis relance le solveur pour verifier s'il existe une deuxieme solution.
 
-Le programme developpe permet de resoudre les differentes variantes du puzzle Easy as ABC en les
-transformant en problemes SAT. Les resultats obtenus montrent que la modelisation est correcte pour les trois variantes prises en charge : `Basic`, `Easy1` et `Easy2`.
+## Variantes traitees
 
-Le solveur Sat4J trouve une solution pour les instances fournies dans le projet. Les fichiers de test utilises sont :
+J'ai implemente les trois variantes demandees dans le sujet.
+
+Pour la variante `Basic`, une grille de taille `n x n` utilise `n` lettres. Chaque lettre doit etre presente une seule fois dans chaque ligne et dans chaque colonne. Les indices sur les bords indiquent directement la premiere lettre visible depuis la direction correspondante.
+
+Pour la variante `Easy1`, la grille utilise `n - 1` lettres. Il y a exactement une case vide dans chaque ligne et dans chaque colonne. Les cases vides sont representees par `X` et ne comptent pas pour les indices exterieurs.
+
+Pour la variante `Easy2`, la grille utilise `n - 2` lettres. Cette fois, chaque ligne et chaque colonne contiennent exactement deux cases vides. Comme pour `Easy1`, les `X` sont ignores lorsqu'on cherche la premiere lettre visible depuis un bord.
+
+## Choix techniques
+
+Le choix principal a ete de conserver une separation claire entre la construction du probleme SAT et sa resolution. Le programme ne donne pas directement les clauses a Sat4J au moment de leur creation : il genere d'abord un fichier DIMACS, puis recharge ce fichier pour la resolution. Cette approche rend le fonctionnement plus facile a verifier, car le fichier CNF reste disponible dans `Dimacs/`.
+
+J'ai aussi choisi d'afficher beaucoup d'informations pendant l'execution : variante du puzzle, taille de la grille, nombre de variables, nombre de clauses, statistiques sur les clauses et nom du solveur utilise. Cela permet de comprendre ce que le programme fait sans devoir ouvrir le code.
+
+Pour la recherche d'une deuxieme solution, j'ai utilise la methode vue en cours : apres avoir obtenu un modele SAT, je construis une clause contenant la negation de tous les litteraux positifs de cette solution. En ajoutant cette clause, Sat4J ne peut plus retourner exactement le meme modele.
+
+## Tests et resultats
+
+J'ai teste le programme avec les instances presentes dans le dossier `Puzzle/` :
 
 - `puzzle.txt`
 - `puzzle_easy1.txt`
 - `puzzle_easy2.txt`
 - `puzzle_test_seconde_solution.txt`
 
-La commande suivante permet de lancer automatiquement tous les tests :
+La commande :
 
 ```bash
-
 make test
 
 ```
 
-Pour chaque instance, le programme genere d'abord un fichier DIMACS, puis appelle Sat4J pour resoudre le probleme. Lorsque le probleme est satisfaisable, la grille solution est affichee dans le terminal.
+lance automatiquement ces quatre instances.
 
-Le programme permet egalement de detecter l'existence d'une deuxieme solution. Pour cela, il ajoute une clause de blocage qui nie la premiere solution trouvee, puis relance Sat4J sur la nouvelle formule. Le fichier `puzzle_test_seconde_solution.txt` permet de verifier ce comportement, car le programme y trouve bien deux solutions distinctes.
+Les tests montrent que les trois variantes sont bien resolues. Pour chaque puzzle, le programme genere un fichier DIMACS, charge les clauses dans Sat4J et affiche une grille solution.
 
-Les tests montrent aussi que le programme gere correctement les cases vides des variantes `Easy1` et `Easy2`. Dans `Easy1`, chaque ligne et chaque colonne contiennent exactement une case vide. Dans `Easy2`, chaque ligne et chaque colonne contiennent exactement deux cases vides.
+Pour repondre a la partie du sujet sur la generation automatique, j'ai ajoute une classe `PuzzleGenerator`. Elle construit automatiquement des grilles valides, calcule les indices exterieurs correspondants, puis ecrit de nouveaux fichiers de puzzle dans le dossier `Puzzle/`.
 
-Ainsi, le projet repond aux objectifs principaux du sujet : lecture d'une instance, generation d'un fichier DIMACS, resolution avec Sat4J, affichage d'une solution et recherche eventuelle d'une seconde solution.
+La commande :
+
+```bash
+make generate
+
+```
+
+genere plusieurs instances de tailles differentes :
+
+- `generated_basic_4.txt`
+- `generated_basic_6.txt`
+- `generated_easy1_5.txt`
+- `generated_easy2_6.txt`
+
+Ces instances permettent de tester a la fois plusieurs variantes et plusieurs tailles de grille. La commande :
+
+```bash
+make test-generated
+
+```
+
+genere ces instances puis les resout automatiquement avec Sat4J.
+
+L'instance `puzzle_test_seconde_solution.txt` sert a verifier la recherche d'une deuxieme solution. Sur cette instance, le programme trouve bien une premiere solution, ajoute une clause de blocage, puis trouve une seconde solution differente.
+
+Les variantes avec cases vides fonctionnent egalement. Dans `Easy1`, chaque ligne et chaque colonne contiennent bien une case `X`. Dans `Easy2`, chaque ligne et chaque colonne contiennent bien deux cases `X`.

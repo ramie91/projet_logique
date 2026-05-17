@@ -4,3 +4,4 @@ Dimacs/*
 build/
 lib/
 .m2/
+GridGenerator.py

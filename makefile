@@ -57,9 +57,20 @@ test: build
 	$(JAVA) -cp "$(BUILD_DIR):$(SAT4J_CP)" Main puzzle_easy1.txt test_easy1.cnf
 	$(JAVA) -cp "$(BUILD_DIR):$(SAT4J_CP)" Main puzzle_easy2.txt test_easy2.cnf
 
+# Génération automatique d'instances
+generate: build
+	$(JAVA) -cp "$(BUILD_DIR):$(SAT4J_CP)" PuzzleGenerator
+
+# Tests sur les instances générées automatiquement
+test-generated: generate
+	$(JAVA) -cp "$(BUILD_DIR):$(SAT4J_CP)" Main generated_basic_4.txt generated_basic_4.cnf
+	$(JAVA) -cp "$(BUILD_DIR):$(SAT4J_CP)" Main generated_basic_6.txt generated_basic_6.cnf
+	$(JAVA) -cp "$(BUILD_DIR):$(SAT4J_CP)" Main generated_easy1_5.txt generated_easy1_5.cnf
+	$(JAVA) -cp "$(BUILD_DIR):$(SAT4J_CP)" Main generated_easy2_6.txt generated_easy2_6.cnf
+
 # Nettoyage
 clean:
-	rm -rf build *.class Dimacs/*
+	rm -rf build *.class Dimacs/* Puzzle/generated_*.txt
 
 # Nettoyage complet des fichiers générés, dépendances Maven comprises
 distclean: clean

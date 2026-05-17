@@ -69,7 +69,8 @@ make clean
 │   ├── SatSolver.java  # Adaptateur vers Sat4J
 │   ├── Cnf.java
 │   ├── Position.java
-│   └── SatVariables.java
+│   ├── SatVariables.java
+│   └── PuzzleGenerator.java
 ├── pom.xml            # Dépendance Sat4J
 ├── makefile           # Automatisation des commandes
 ├── Dimacs/            # Dossier dans lequel je génère les clauses logiques.
@@ -85,6 +86,8 @@ make clean
 | `make build` | Compile mon projet Java                                  |
 | `make run`   | Lance mon programme                                      |
 | `make test`  | Lance mes instances de test                              |
+| `make generate` | Génère automatiquement des instances de tailles différentes |
+| `make test-generated` | Lance les instances générées automatiquement        |
 | `make clean` | Supprime les fichiers compilés et les fichiers DIMACS    |
 
 ---
